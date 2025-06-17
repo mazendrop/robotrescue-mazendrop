@@ -9,6 +9,12 @@ import java.util.Scanner;
 
 import model.Robot;
 
+/**
+ *
+ * @autor Mazen Abdallah
+ */
+
+
 public class RobotApp {
 
     public static final String SAVE_FILE_NAME = "save";
