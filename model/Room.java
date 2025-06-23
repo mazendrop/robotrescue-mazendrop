@@ -1,5 +1,10 @@
 package model;
 
+/*
+ * @author Mazen Abdallah
+ * @author Hassan Ibrahim
+ */
+
 import challenges.Challenge;
 import java.io.Serializable;
 

@@ -1,20 +1,17 @@
 package app;
 
+/*
+ * @author Mazen Abdallah
+ * @author Hassan Ibrahim
+ */
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Scanner;
-
 import model.Robot;
-
-/**
- *dd
- * @autor Mazen Abdallah
- * @autor Hassan Ibrahim
- */
-
 
 public class RobotApp {
 
@@ -98,7 +95,7 @@ public class RobotApp {
         System.out.print("Wie soll dein Roboter heißen? ");
         String name = scanner.nextLine();
 
-        this.game = new RobotGame(name);   // ← نمرّر الاسم
+        this.game = new RobotGame(name);
         continueGame();
     }
 

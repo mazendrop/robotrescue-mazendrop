@@ -1,5 +1,10 @@
 package model;
 
+/*
+ * @author Mazen Abdallah
+ * @author Hassan Ibrahim
+ */
+
 import java.io.Serializable;
 import java.util.Random;
 

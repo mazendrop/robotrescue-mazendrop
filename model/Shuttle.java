@@ -1,5 +1,10 @@
 package model;
 
+/*
+ * @author Mazen Abdallah
+ * @author Hassan Ibrahim
+ */
+
 import java.io.Serializable;
 
 public class Shuttle implements Serializable {
