@@ -13,7 +13,6 @@ import model.Robot;
  *dd
  * @autor Mazen Abdallah
  * @autor Hassan Ibrahim
- * Test
  */
 
 
@@ -40,10 +39,20 @@ public class RobotApp {
     private void showMainMenu() {
         System.out.println("You're in the main menu");
         System.out.println("What do you want to do next?");
-        System.out.println("(1) Start new game");
-        System.out.println("(6) Quit");
-        System.out.println("");
-        System.out.println("Please choose a number between 1 and 6: ");
+        System.out.println("(1) Spiel starten");
+
+        if (isGameRunning()) {
+            System.out.println("(2) Spiel fortsetzen");
+            System.out.println("(4) Spiel speichern");
+        }
+
+        if (hasSavedGame()) {
+            System.out.println("(3) Spiel laden");
+            System.out.println("(5) Spiel löschen");
+        }
+
+        System.out.println("(6) Programm beenden");
+        System.out.println("\nBitte wähle eine Option: ");
     }
 
     private String readUserInput() {
@@ -59,20 +68,40 @@ public class RobotApp {
                 this.startNewGame();
                 break;
             case "2":
+                if (isGameRunning()) this.continueGame();
+                else System.out.println("Kein laufendes Spiel.");
                 break;
-            // ...
+            case "3":
+                if (hasSavedGame()) this.loadGame();
+                else System.out.println("Kein gespeichertes Spiel gefunden.");
+                break;
+            case "4":
+                if (isGameRunning()) this.saveGame();
+                else System.out.println("Kein Spiel zum Speichern.");
+                break;
+            case "5":
+                if (hasSavedGame()) this.deleteGame();
+                else System.out.println("Kein gespeichertes Spiel zum Löschen.");
+                break;
             case "6":
+                System.out.println("Spiel wird beendet...");
+                System.exit(0);
                 break;
             default:
-                System.out.println("Invalid input. Please choose a correct number between 1 and 6");
+                System.out.println("Ungültige Eingabe! Bitte zwischen 1 und 6 wählen.");
                 break;
         }
     }
 
     private void startNewGame() {
-        this.game = new RobotGame();
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Wie soll dein Roboter heißen? ");
+        String name = scanner.nextLine();
+
+        this.game = new RobotGame(name);   // ← نمرّر الاسم
         continueGame();
     }
+
 
     private void continueGame() {
         this.game.setGameRunning(true);

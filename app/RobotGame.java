@@ -11,10 +11,11 @@ public class RobotGame {
     private boolean gameRunning = true;
     private boolean gameFinished = false;
 
-    public RobotGame() {
-        this.robot = new Robot();
-        this.shuttle = new Shuttle("name");
+    public RobotGame(String robotName) {
+        this.robot   = new Robot(robotName);   // ← نمرّر الاسم
+        this.shuttle = new Shuttle("EscapePod");
     }
+
 
     public boolean isGameRunning() {
         return gameRunning;
@@ -33,7 +34,8 @@ public class RobotGame {
     }
 
     public void run() {
-        System.out.println("The game has started. Or not?");
+        System.out.println("Die Expedition beginnt! Viel Erfolg, " + robot.getName() + "!");
+
     }
 
     public Robot getRobot() {
