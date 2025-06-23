@@ -32,11 +32,14 @@ public class Shuttle implements Serializable {
      * Wenn kein Artefakt mit dem Namen gefunden wird, soll null zurückgegeben werden.
      */
     public Artifact getArtifactByName(String artifactName) {
-        System.out.println("Method not implemented yet.");
-        // TODO: Durchlaufe das Array 'artifacts' und vergleiche jeden Namen (ignoriere Groß-/Kleinschreibung).
-        // Gib das passende Artefakt zurück, wenn es gefunden wurde, sonst null.
+        for (Artifact artifact : artifacts) {
+            if (artifact.getName().equalsIgnoreCase(artifactName)) {
+                return artifact;
+            }
+        }
         return null;
     }
+
 
     /**
      * Prüft, ob alle Artefakte installiert sind.
@@ -44,10 +47,12 @@ public class Shuttle implements Serializable {
      * Gibt true zurück, wenn alle installiert sind, sonst false.
      */
     public boolean isReadyToLaunch() {
-        System.out.println("Method not implemented yet.");
-        // TODO: Überprüfe für jedes Artefakt im Array 'artifacts', ob es installiert ist.
-        // Sobald ein Artefakt nicht installiert ist, gib false zurück.
-        // Falls alle installiert sind, gib true zurück.
-        return false;
+        for (Artifact artifact : artifacts) {
+            if (!artifact.isInstalled()) {
+                return false;
+            }
+        }
+        return true;
     }
+
 }

@@ -3,6 +3,7 @@ package app;
 import model.Robot;
 import model.Room;
 import model.Shuttle;
+import model.Artifact;
 
 public class RobotGame {
     private final Robot robot;
@@ -12,7 +13,7 @@ public class RobotGame {
     private boolean gameFinished = false;
 
     public RobotGame(String robotName) {
-        this.robot   = new Robot(robotName);   // ← نمرّر الاسم
+        this.robot   = new Robot(robotName);
         this.shuttle = new Shuttle("EscapePod");
     }
 
