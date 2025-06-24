@@ -1,10 +1,18 @@
 package app;
 
+/*
+ * @author Mazen Abdallah
+ * @author Hassan Ibrahim
+ */
+
 import model.Robot;
 import model.Room;
 import model.Shuttle;
+import java.io.Serializable;
 
-public class RobotGame {
+public class RobotGame implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private final Robot robot;
     private final Room[] rooms = new Room[3];
     private final Shuttle shuttle;
@@ -38,5 +46,14 @@ public class RobotGame {
 
     public Robot getRobot() {
         return robot;
+    }
+
+    public void printStatus() {
+        System.out.println("\n=== Roboter-Status ===");
+        System.out.println("Name: " + robot.getName());
+        System.out.println("Energie: " + robot.getEnergy());
+        System.out.println("Schaden: " + robot.getDamage());
+        System.out.println("Erfahrung: " + robot.getExperiencePoints());
+        System.out.println("Funktionsfähig: " + (robot.isOperational() ? "Ja" : "Nein"));
     }
 }

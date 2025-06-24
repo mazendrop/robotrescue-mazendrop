@@ -40,11 +40,11 @@ public class RobotApp {
 
         if (isGameRunning()) {
             System.out.println("(2) Spiel fortsetzen");
-            System.out.println("(4) Spiel speichern");
+            System.out.println("(3) Spiel speichern");
         }
 
         if (hasSavedGame()) {
-            System.out.println("(3) Spiel laden");
+            System.out.println("(4) Spiel laden");
             System.out.println("(5) Spiel löschen");
         }
 
@@ -54,9 +54,7 @@ public class RobotApp {
 
     private String readUserInput() {
         Scanner scanner = new Scanner(System.in);
-        String userInput = scanner.nextLine();
-        // TBD
-        return userInput;
+        return scanner.nextLine();
     }
 
     private void handleUserInput(String input) {
@@ -68,15 +66,15 @@ public class RobotApp {
                 if (isGameRunning()) this.continueGame();
                 else System.out.println("Kein laufendes Spiel.");
                 break;
-            case "3":
-                if (hasSavedGame()) this.loadGame();
-                else System.out.println("Kein gespeichertes Spiel gefunden.");
-                break;
-            case "4":
+            case "3":  // Speichern
                 if (isGameRunning()) this.saveGame();
                 else System.out.println("Kein Spiel zum Speichern.");
                 break;
-            case "5":
+            case "4":  // Laden
+                if (hasSavedGame()) this.loadGame();
+                else System.out.println("Kein gespeichertes Spiel gefunden.");
+                break;
+            case "5":  // Löschen
                 if (hasSavedGame()) this.deleteGame();
                 else System.out.println("Kein gespeichertes Spiel zum Löschen.");
                 break;
@@ -99,10 +97,44 @@ public class RobotApp {
         continueGame();
     }
 
-
     private void continueGame() {
         this.game.setGameRunning(true);
-        this.game.run();
+        Scanner scanner = new Scanner(System.in);
+
+        while (true) {
+            System.out.println("\nWas möchtest du tun?");
+            System.out.println("(1) Forschungsstation erkunden");
+            System.out.println("(2) Status anzeigen");
+            System.out.println("(3) Energie aufladen");
+            System.out.println("(4) Reparieren");
+            System.out.println("(5) Spiel verlassen");
+            System.out.print("Deine Wahl: ");
+            String wahl = scanner.nextLine();
+
+            switch (wahl) {
+                case "1":
+                    game.run();
+                    break;
+                case "2":
+                    game.printStatus();
+                    break;
+                case "3":
+                    System.out.print("Wie viel Energie hinzufügen? ");
+                    int energie = Integer.parseInt(scanner.nextLine());
+                    game.getRobot().recharge(energie);
+                    break;
+                case "4":
+                    System.out.print("Wie viel Schaden reparieren? ");
+                    int schaden = Integer.parseInt(scanner.nextLine());
+                    game.getRobot().repairDamage(schaden);
+                    break;
+                case "5":
+                    System.out.println("Spiel wird verlassen...");
+                    return;
+                default:
+                    System.out.println("Ungültige Eingabe.");
+            }
+        }
     }
 
     private void deleteGame() {
@@ -118,7 +150,6 @@ public class RobotApp {
             oos.flush();
         } catch (Exception ex) {
             System.err.println("Something went wrong while saving the game: " + ex.getMessage());
-            return;
         }
         System.out.println("Game saved!");
     }
@@ -144,5 +175,4 @@ public class RobotApp {
     private boolean hasSavedGame() {
         return new File(SAVE_FILE_NAME).exists();
     }
-
 }
