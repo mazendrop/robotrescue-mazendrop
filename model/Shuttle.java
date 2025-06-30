@@ -13,11 +13,8 @@ public class Shuttle implements Serializable {
 
     private final String name;
 
-    private final Artifact[] artifacts = new Artifact[] {
-            new Artifact(Artifact.NAVIGATION_MODULE),
-            new Artifact(Artifact.CONTROL_SYSTEM),
-            new Artifact(Artifact.ENERGY_CRYSTAL)
-    };
+    private final Artifact[] artifacts = new Artifact[3];
+
 
     public Shuttle(String name) {
         this.name = name;

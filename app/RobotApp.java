@@ -116,18 +116,26 @@ public class RobotApp {
                     game.run();
                     break;
                 case "2":
-                    game.printStatus();
+                    game.printMissionStatus();
                     break;
                 case "3":
-                    System.out.print("Wie viel Energie hinzufügen? ");
-                    int energie = Integer.parseInt(scanner.nextLine());
-                    game.getRobot().recharge(energie);
+                    int aktuelleEnergie = game.getRobot().getEnergy();
+                    int maxEnergie = game.getRobot().getMaxEnergy();
+                    int zehnProzent = maxEnergie / 10;
+                    int energieFehlt = maxEnergie - aktuelleEnergie;
+
+                    if (energieFehlt <= 0) {
+                        System.out.println("Die Energie ist bereits voll.");
+                    } else {
+                        int aufladen = Math.min(zehnProzent, energieFehlt);
+                        game.getRobot().recharge(aufladen);
+                        System.out.println("Der Roboter wurde um " + aufladen + " Energie aufgeladen.");
+                    }
                     break;
                 case "4":
-                    System.out.print("Wie viel Schaden reparieren? ");
-                    int schaden = Integer.parseInt(scanner.nextLine());
-                    game.getRobot().repairDamage(schaden);
+                    game.openMaintenanceMenu();
                     break;
+
                 case "5":
                     System.out.println("Spiel wird verlassen...");
                     return;

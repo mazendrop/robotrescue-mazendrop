@@ -14,15 +14,16 @@ public class Room implements Serializable {
 
     private int number;
     private Challenge challenge;
-    private String artifact;
+    private Artifact artifact;
     private boolean open;
 
-    public Room(int number, Challenge challenge, String artifact) {
+    public Room(int number, Challenge challenge, Artifact artifact) {
         this.number = number;
         this.challenge = challenge;
         this.artifact = artifact;
-        this.open = false; // Räume sind zu Beginn verschlossen
+        this.open = false;
     }
+
 
     public int getNumber() {
         return number;
@@ -32,9 +33,10 @@ public class Room implements Serializable {
         return challenge;
     }
 
-    public String getArtifact() {
+    public Artifact getArtifact() {
         return artifact;
     }
+
 
     public boolean isOpen() {
         return open;

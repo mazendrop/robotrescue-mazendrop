@@ -111,5 +111,13 @@ public class Robot implements Serializable {
     public boolean isOperational() {
         return operational;
     }
+
+    private final int maxEnergy = 100;
+
+    public int getMaxEnergy() {
+        return maxEnergy;
+    }
+
+
 }
 
