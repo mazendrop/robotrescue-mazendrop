@@ -135,7 +135,7 @@ public class RobotGame implements Serializable {
         boolean allesInstalliert = true;
         for (Artifact artifact : shuttle.getArtifacts()) {
             if (!artifact.isInstalled()) {
-                artifact.install(); // أو setInstalled(true) حسب كودك
+                artifact.install();
             }
             if (!artifact.isInstalled()) {
                 allesInstalliert = false;
