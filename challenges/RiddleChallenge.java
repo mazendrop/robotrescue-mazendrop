@@ -1,5 +1,10 @@
 package challenges;
 
+/*
+ * @author Mazen Abdallah
+ * @author Hassan Ibrahim
+ */
+
 public class RiddleChallenge implements Challenge {
     private final String question = "Was hat viele Schlüssel, aber kann keine Türen öffnen?";
     private final String answer = "Klavier";

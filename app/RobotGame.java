@@ -5,6 +5,9 @@ package app;
  * @author Hassan Ibrahim
  */
 
+import games.Game;
+import games.Nim;
+import games.TicTacToe;
 import model.*;
 import challenges.Challenge;
 import challenges.RiddleChallenge;
@@ -23,10 +26,8 @@ public class RobotGame implements Serializable {
         this.robot = new Robot(robotName);
         this.shuttle = new Shuttle("Zukunft");
 
-        // Räume initialisieren (1 bis 3)
         for (int i = 0; i < rooms.length; i++) {
             rooms[i] = new Room(i + 1, new RiddleChallenge(), shuttle.getArtifacts()[i]);
-
         }
     }
 
@@ -64,20 +65,49 @@ public class RobotGame implements Serializable {
         System.out.println("\n>>>>> Starte Missionsrunde...");
         System.out.println("Die Expedition beginnt! Viel Erfolg, " + robot.getName() + "!");
 
-        // Energieverbrauch 10%
+        // Energieverlust 10 %
         int energieVerlust = (int) (robot.getEnergy() * 0.10);
         robot.recharge(-energieVerlust);
 
-        int zufall = (int) (Math.random() * 100); // 0–99
+        int zufall = (int) (Math.random() * 100);
 
         if (zufall < 50) {
             System.out.println("Die Erkundung war ereignislos. Der Roboter setzt die Suche fort.");
         } else if (zufall < 75) {
-            System.out.println("Ein Feind nähert sich! Der Roboter muss kämpfen.");
-            Enemy enemy = Math.random() < 0.5
-                    ? new DroneEnemy("Drohne", 50)
-                    : new AlienEnemy("Alien", 60);
-            enemy.fight(robot);
+            System.out.println("Ein Feind nähert sich! Was möchtest du tun?");
+            System.out.println("(1) Kämpfen");
+            System.out.println("(2) Spiel spielen");
+            System.out.println("(3) Fliehen");
+
+            Scanner scanner = new Scanner(System.in);
+            String wahl = scanner.nextLine();
+
+            switch (wahl) {
+                case "1": {
+                    Enemy enemy = Math.random() < 0.5
+                            ? new DroneEnemy("Drohne", 50)
+                            : new AlienEnemy("Alien", 60);
+                    enemy.fight(robot);
+                    break;
+                }
+                case "2":
+                    playMiniGame();
+                    break;
+                case "3":
+                    if (Math.random() < 0.10) {
+                        System.out.println("Flucht erfolgreich! Der Roboter entkommt dem Gegner.");
+                    } else {
+                        System.out.println("Flucht fehlgeschlagen! Der Roboter muss kämpfen.");
+                        Enemy enemy = Math.random() < 0.5
+                                ? new DroneEnemy("Drohne", 50)
+                                : new AlienEnemy("Alien", 60);
+                        enemy.fight(robot);
+                    }
+                    break;
+                default:
+                    System.out.println("Ungültige Wahl. Der Roboter zieht sich zurück.");
+            }
+
         } else {
             System.out.println("Der Roboter stößt auf eine verschlossene Tür...");
             Challenge challenge = new RiddleChallenge();
@@ -100,11 +130,8 @@ public class RobotGame implements Serializable {
 
     public void printMissionStatus() {
         System.out.println("\n=== Missionsstatus ===");
-
-        // 1. Roboterstatus
         printStatus();
 
-        // 2. Shuttle-Status
         System.out.println("\n--- Shuttle-Status ---");
         for (var artifact : shuttle.getArtifacts()) {
             if (artifact != null) {
@@ -114,7 +141,6 @@ public class RobotGame implements Serializable {
             }
         }
 
-        // 3. Räume
         System.out.println("\n--- Raum-Übersicht ---");
         for (Room room : rooms) {
             if (room == null) continue;
@@ -195,6 +221,37 @@ public class RobotGame implements Serializable {
         }
     }
 
+    private void playMiniGame() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Wähle ein Spiel:");
+        System.out.println("(1) TicTacToe");
+        System.out.println("(2) Nim");
+        System.out.print("Deine Wahl: ");
+        String input = scanner.nextLine();
 
+        Game game;
 
+        if (input.equals("1")) {
+            game = new TicTacToe();
+        } else if (input.equals("2")) {
+            game = new Nim();
+        } else {
+            System.out.println("Ungültige Eingabe.");
+            return;
+        }
+
+        while (!game.isFinished()) {
+            game.playNextRound();
+        }
+
+        if (game.isWon()) {
+            System.out.println("Du hast das Spiel gewonnen! +20 Erfahrungspunkte.");
+            robot.addExperiencePoints(20);
+        } else if (game.isLost()) {
+            System.out.println("Du hast das Spiel verloren. Keine Belohnung.");
+        } else if (game.isTie()) {
+            System.out.println("Unentschieden! +10 Erfahrungspunkte.");
+            robot.addExperiencePoints(10);
+        }
+    }
 }
