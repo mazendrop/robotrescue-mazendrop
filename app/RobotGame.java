@@ -9,16 +9,18 @@ import games.Game;
 import games.Nim;
 import games.TicTacToe;
 import model.*;
-import challenges.Challenge;
-import challenges.RiddleChallenge;
-import java.util.Scanner;
+import challenges.*;
+
 import java.io.Serializable;
+import java.util.Scanner;
 
 public class RobotGame implements Serializable {
     private static final long serialVersionUID = 1L;
+
     private final Robot robot;
     private final Room[] rooms = new Room[3];
     private final Shuttle shuttle;
+
     private boolean gameRunning = false;
     private boolean gameFinished = false;
 
@@ -26,8 +28,15 @@ public class RobotGame implements Serializable {
         this.robot = new Robot(robotName);
         this.shuttle = new Shuttle("Zukunft");
 
+        Challenge[] challenges = new Challenge[] {
+                new BinaryCode(),
+                new MorseCode(),
+                new SecretCode()
+        };
+
         for (int i = 0; i < rooms.length; i++) {
-            rooms[i] = new Room(i + 1, new RiddleChallenge(), shuttle.getArtifacts()[i]);
+            Artifact artifact = shuttle.getArtifacts()[i];
+            rooms[i] = new Room(i + 1, challenges[i], artifact);
         }
     }
 
@@ -52,24 +61,23 @@ public class RobotGame implements Serializable {
     }
 
     public void printStatus() {
-        Robot r = this.robot;
         System.out.println("\n=== Roboter-Status ===");
-        System.out.println("Name: " + r.getName());
-        System.out.println("Energie: " + r.getEnergy());
-        System.out.println("Schaden: " + r.getDamage());
-        System.out.println("Erfahrung: " + r.getExperiencePoints());
-        System.out.println("Funktionsfähig: " + (r.isOperational() ? "Ja" : "Nein"));
+        System.out.println("Name: " + robot.getName());
+        System.out.println("Energie: " + robot.getEnergy());
+        System.out.println("Schaden: " + robot.getDamage());
+        System.out.println("Erfahrung: " + robot.getExperiencePoints());
+        System.out.println("Funktionsfähig: " + (robot.isOperational() ? "Ja" : "Nein"));
     }
 
     public void run() {
         System.out.println("\n>>>>> Starte Missionsrunde...");
         System.out.println("Die Expedition beginnt! Viel Erfolg, " + robot.getName() + "!");
 
-        // Energieverlust 10 %
         int energieVerlust = (int) (robot.getEnergy() * 0.10);
         robot.recharge(-energieVerlust);
 
         int zufall = (int) (Math.random() * 100);
+        Scanner scanner = new Scanner(System.in);
 
         if (zufall < 50) {
             System.out.println("Die Erkundung war ereignislos. Der Roboter setzt die Suche fort.");
@@ -78,18 +86,13 @@ public class RobotGame implements Serializable {
             System.out.println("(1) Kämpfen");
             System.out.println("(2) Spiel spielen");
             System.out.println("(3) Fliehen");
-
-            Scanner scanner = new Scanner(System.in);
             String wahl = scanner.nextLine();
 
             switch (wahl) {
-                case "1": {
-                    Enemy enemy = Math.random() < 0.5
-                            ? new DroneEnemy("Drohne", 50)
-                            : new AlienEnemy("Alien", 60);
+                case "1":
+                    Enemy enemy = Math.random() < 0.5 ? new DroneEnemy("Drohne", 50) : new AlienEnemy("Alien", 60);
                     enemy.fight(robot);
                     break;
-                }
                 case "2":
                     playMiniGame();
                     break;
@@ -98,9 +101,7 @@ public class RobotGame implements Serializable {
                         System.out.println("Flucht erfolgreich! Der Roboter entkommt dem Gegner.");
                     } else {
                         System.out.println("Flucht fehlgeschlagen! Der Roboter muss kämpfen.");
-                        Enemy enemy = Math.random() < 0.5
-                                ? new DroneEnemy("Drohne", 50)
-                                : new AlienEnemy("Alien", 60);
+                        enemy = Math.random() < 0.5 ? new DroneEnemy("Drohne", 50) : new AlienEnemy("Alien", 60);
                         enemy.fight(robot);
                     }
                     break;
@@ -109,18 +110,28 @@ public class RobotGame implements Serializable {
             }
 
         } else {
-            System.out.println("Der Roboter stößt auf eine verschlossene Tür...");
-            Challenge challenge = new RiddleChallenge();
-            Scanner scanner = new Scanner(System.in);
+            Room roomToOpen = chooseRandomClosedRoom();
+            if (roomToOpen == null) {
+                System.out.println("Alle Räume wurden bereits geöffnet.");
+                return;
+            }
 
+            Challenge challenge = roomToOpen.getChallenge();
+            System.out.println("Der Roboter stößt auf eine verschlossene Tür...");
             System.out.println("Challenge: " + challenge.getDescription());
             System.out.println("Hinweis: " + challenge.getHint());
             System.out.print("Deine Antwort: ");
             String antwort = scanner.nextLine();
 
             if (challenge.tryCode(antwort)) {
+                roomToOpen.setOpen(true);
+                Artifact artifact = roomToOpen.getArtifact();
+                if (artifact != null) {
+                    artifact.setFound(true);
+                }
+
                 System.out.println("Challenge bestanden! Der Raum wird geöffnet.");
-                System.out.println("Der Roboter findet wertvolle Ersatzteile und gewinnt Energie.");
+                System.out.println("Der Roboter findet das Artefakt '" + artifact.getName() + "' und gewinnt Energie.");
                 robot.recharge(20);
             } else {
                 System.out.println("Challenge nicht bestanden. Der Roboter zieht sich zurück.");
@@ -133,8 +144,8 @@ public class RobotGame implements Serializable {
         printStatus();
 
         System.out.println("\n--- Shuttle-Status ---");
-        for (var artifact : shuttle.getArtifacts()) {
-            if (artifact != null) {
+        for (Artifact artifact : shuttle.getArtifacts()) {
+            if (artifact != null && artifact.isFound()) {
                 System.out.println("Gefundenes Ersatzteil: " + artifact.getName());
             } else {
                 System.out.println("Fehlendes Ersatzteil");
@@ -143,16 +154,11 @@ public class RobotGame implements Serializable {
 
         System.out.println("\n--- Raum-Übersicht ---");
         for (Room room : rooms) {
-            if (room == null) continue;
-
             String zustand = room.isOpen() ? "geöffnet" : "nicht geöffnet";
-
             System.out.print("Raum " + room.getNumber() + ": " + zustand);
-
             if (room.isOpen() && room.getChallenge() != null && room.getChallenge().isSolved()) {
                 System.out.print(" (Challenge gelöst)");
             }
-
             System.out.println();
         }
     }
@@ -160,7 +166,7 @@ public class RobotGame implements Serializable {
     public boolean installArtifactsToShuttle() {
         boolean allesInstalliert = true;
         for (Artifact artifact : shuttle.getArtifacts()) {
-            if (!artifact.isInstalled()) {
+            if (artifact.isFound() && !artifact.isInstalled()) {
                 artifact.install();
             }
             if (!artifact.isInstalled()) {
@@ -187,9 +193,7 @@ public class RobotGame implements Serializable {
                     int schaden = Integer.parseInt(scanner.nextLine());
                     int vorher = robot.getDamage();
                     robot.repairDamage(schaden);
-                    int nachher = robot.getDamage();
-                    int repariert = vorher - nachher;
-                    System.out.println("Der Roboter wurde um " + repariert + " Schadenspunkte repariert.");
+                    System.out.println("Der Roboter wurde um " + (vorher - robot.getDamage()) + " Punkte repariert.");
                     break;
 
                 case "2":
@@ -199,12 +203,10 @@ public class RobotGame implements Serializable {
                     }
 
                     for (Room room : rooms) {
-                        if (room != null && room.isOpen()) {
-                            Artifact artifact = room.getArtifact();
-                            if (artifact != null && artifact.isFound() && !artifact.isInstalled()) {
-                                artifact.install();
-                                System.out.println(artifact.getName() + " wurde installiert!");
-                            }
+                        Artifact artifact = room.getArtifact();
+                        if (room.isOpen() && artifact.isFound() && !artifact.isInstalled()) {
+                            artifact.install();
+                            System.out.println(artifact.getName() + " wurde installiert!");
                         }
                     }
 
@@ -213,8 +215,10 @@ public class RobotGame implements Serializable {
                         setGameFinished(true);
                     }
                     break;
+
                 case "3":
                     return;
+
                 default:
                     System.out.println("Ungültige Eingabe!");
             }
@@ -229,16 +233,7 @@ public class RobotGame implements Serializable {
         System.out.print("Deine Wahl: ");
         String input = scanner.nextLine();
 
-        Game game;
-
-        if (input.equals("1")) {
-            game = new TicTacToe();
-        } else if (input.equals("2")) {
-            game = new Nim();
-        } else {
-            System.out.println("Ungültige Eingabe.");
-            return;
-        }
+        Game game = input.equals("1") ? new TicTacToe() : new Nim();
 
         while (!game.isFinished()) {
             game.playNextRound();
@@ -253,5 +248,12 @@ public class RobotGame implements Serializable {
             System.out.println("Unentschieden! +10 Erfahrungspunkte.");
             robot.addExperiencePoints(10);
         }
+    }
+
+    private Room chooseRandomClosedRoom() {
+        return java.util.Arrays.stream(rooms)
+                .filter(r -> !r.isOpen())
+                .findAny()
+                .orElse(null);
     }
 }
