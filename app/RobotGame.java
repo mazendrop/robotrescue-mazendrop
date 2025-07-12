@@ -70,11 +70,22 @@ public class RobotGame implements Serializable {
     }
 
     public void run() {
+        if (gameFinished) {
+            System.out.println("Das Spiel ist bereits beendet.");
+            return;
+        }
+
         System.out.println("\n>>>>> Starte Missionsrunde...");
         System.out.println("Die Expedition beginnt! Viel Erfolg, " + robot.getName() + "!");
 
         int energieVerlust = (int) (robot.getEnergy() * 0.10);
         robot.recharge(-energieVerlust);
+
+        if (!robot.isOperational()) {
+            System.out.println("Der Roboter ist zerstört oder hat keine Energie mehr. Spiel endgültig verloren.");
+            gameFinished = true;
+            return;
+        }
 
         int zufall = (int) (Math.random() * 100);
         Scanner scanner = new Scanner(System.in);
@@ -128,14 +139,26 @@ public class RobotGame implements Serializable {
                 Artifact artifact = roomToOpen.getArtifact();
                 if (artifact != null) {
                     artifact.setFound(true);
+                    System.out.println("Challenge bestanden! Der Raum wird geöffnet.");
+                    System.out.println("Der Roboter findet das Artefakt '" + artifact.getName() + "' und gewinnt Energie.");
+                    robot.recharge(20);
+                } else {
+                    System.out.println("Challenge bestanden! Raum geöffnet, aber kein Artefakt gefunden.");
                 }
-
-                System.out.println("Challenge bestanden! Der Raum wird geöffnet.");
-                System.out.println("Der Roboter findet das Artefakt '" + artifact.getName() + "' und gewinnt Energie.");
-                robot.recharge(20);
             } else {
                 System.out.println("Challenge nicht bestanden. Der Roboter zieht sich zurück.");
             }
+        }
+
+        if (shuttle.isReadyToLaunch()) {
+            System.out.println("Alle Ersatzteile installiert! Das Shuttle kann starten.");
+            System.out.println("🎉 Du hast das Spiel gewonnen!");
+            gameFinished = true;
+        }
+
+        if (!robot.isOperational()) {
+            System.out.println("Der Roboter wurde zerstört oder hat keine Energie mehr. Spiel verloren.");
+            gameFinished = true;
         }
     }
 
@@ -204,7 +227,7 @@ public class RobotGame implements Serializable {
 
                     for (Room room : rooms) {
                         Artifact artifact = room.getArtifact();
-                        if (room.isOpen() && artifact.isFound() && !artifact.isInstalled()) {
+                        if (room.isOpen() && artifact != null && artifact.isFound() && !artifact.isInstalled()) {
                             artifact.install();
                             System.out.println(artifact.getName() + " wurde installiert!");
                         }
@@ -212,7 +235,7 @@ public class RobotGame implements Serializable {
 
                     if (shuttle.isReadyToLaunch()) {
                         System.out.println("Alle Artefakte installiert! Shuttle bereit zum Start. Spiel erfolgreich beendet 🚀");
-                        setGameFinished(true);
+                        gameFinished = true;
                     }
                     break;
 
