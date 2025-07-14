@@ -147,31 +147,13 @@ public class RobotGame implements Serializable {
             System.out.println("Der Roboter stößt auf eine verschlossene Tür...");
             System.out.println("Challenge: " + challenge.getDescription());
             System.out.println("Hinweis: " + challenge.getHint());
-            //System.out.print("Deine Antwort: ");
-            //String antwort = scanner.nextLine();
-
-
 
             int versuch = 1;
             while (challenge.getAttemptsLeft() > 0 && !challenge.isSolved()) {
 
-
-                //Wir wissen nicht ob diese ( ExecutorService ) erlaubt ist oder nicht.
-                 System.out.println("Du hast 30 Sekunden, um die Antwort einzugeben:");
-
-                ExecutorService executor = Executors.newSingleThreadExecutor();
-                Future<String> future = executor.submit(scanner::nextLine);
-                String antwort = null;
-                try {
-                    antwort = future.get(30, TimeUnit.SECONDS);
-                } catch (TimeoutException e) {
-                    System.out.println(" Zeit überschritten! Keine Antwort gegeben.");
-                    antwort = ""; // damit der Versuch als falsch zählt
-                } catch (Exception e) {
-                    System.out.println("Ein Fehler ist aufgetreten: " + e.getMessage());
-                    antwort = "";
-                }
-                executor.shutdown();
+                System.out.println("Du hast 30 Sekunden, um die Antwort einzugeben:");
+                System.out.print("Deine Antwort: ");
+                String antwort = scanner.nextLine();
 
                 if (challenge.tryCode(antwort)) {
                     roomToOpen.setOpen(true);
