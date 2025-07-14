@@ -180,7 +180,7 @@ public class RobotGame implements Serializable {
 
         if (shuttle.isReadyToLaunch()) {
             System.out.println("Alle Ersatzteile installiert! Das Shuttle kann starten.");
-            System.out.println("🎉 Du hast das Spiel gewonnen!");
+            System.out.println("Du hast das Spiel gewonnen!");
             gameFinished = true;
         }
 
@@ -309,7 +309,7 @@ public class RobotGame implements Serializable {
 
     /** Wählt zufällig einen noch nicht geöffneten Raum */
     private Room chooseRandomClosedRoom() {
-        // Schritt 1: Zähle wie viele Räume noch geschlossen sind
+        // Schritt 1: Zählt wie viele Räume noch geschlossen sind
         int count = 0;
         for (Room room : rooms) {
             if (!room.isOpen()) {
@@ -320,7 +320,7 @@ public class RobotGame implements Serializable {
         // Schritt 2: Wenn alle offen sind, gib null zurück
         if (count == 0) return null;
 
-        // Schritt 3: Wähle einen zufälligen Index unter den geschlossenen Räumen
+        // Schritt 3: Wählt einen zufälligen Index unter den geschlossenen Räumen
         int randomIndex = (int) (Math.random() * count);
 
         // Schritt 4: Durchlaufe erneut, um das entsprechende geschlossene Zimmer zu finden
@@ -334,7 +334,7 @@ public class RobotGame implements Serializable {
             }
         }
 
-        return null; // sollte eigentlich nie erreicht werden
+        return null;
     }
 
 }
