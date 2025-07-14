@@ -1,6 +1,10 @@
 package app;
 
-/*
+/**
+ * Hauptklasse für die Roboter-Abenteuer-Anwendung.
+ * Verwaltet das Hauptmenü, den Spielstart, das Laden/Speichern
+ * und die Spielfortsetzung.
+ *
  * @author Mazen Abdallah
  * @author Hassan Ibrahim
  */
@@ -15,9 +19,19 @@ import model.Robot;
 
 public class RobotApp {
 
+    // Dateiname für den Spielstand
     public static final String SAVE_FILE_NAME = "save";
+
+    // Referenz auf das aktuelle Spielobjekt
     private RobotGame game;
+
+    // Gibt an, ob ein Spiel aktiv ist
     private boolean gameRunning = true;
+
+    /**
+     * Einstiegspunkt der Anwendung
+     * zeigt das Hauptmenü an und verarbeitet Benutzereingaben in einer Schleife
+     */
 
     public static void main(String[] args) {
         System.out.println("Welcome to the robot adventure");
@@ -33,6 +47,7 @@ public class RobotApp {
         }
     }
 
+    // Zeigt das Hauptmenü an
     private void showMainMenu() {
         System.out.println("You're in the main menu");
         System.out.println("What do you want to do next?");
@@ -52,11 +67,19 @@ public class RobotApp {
         System.out.println("\nBitte wähle eine Option: ");
     }
 
+    /**
+     * Liest eine Texteingabe vom Benutzer.
+     * return die eingegebene Zeichenkette
+     */
     private String readUserInput() {
         Scanner scanner = new Scanner(System.in);
         return scanner.nextLine();
     }
 
+    /**
+     * Verarbeitet die Benutzereingabe aus dem Hauptmenü.
+     * input die vom Benutzer gewählte Option
+     */
     private void handleUserInput(String input) {
         switch (input) {
             case "1":
@@ -66,15 +89,15 @@ public class RobotApp {
                 if (isGameRunning()) this.continueGame();
                 else System.out.println("Kein laufendes Spiel.");
                 break;
-            case "3":  // Speichern
+            case "3":
                 if (isGameRunning()) this.saveGame();
                 else System.out.println("Kein Spiel zum Speichern.");
                 break;
-            case "4":  // Laden
+            case "4":
                 if (hasSavedGame()) this.loadGame();
                 else System.out.println("Kein gespeichertes Spiel gefunden.");
                 break;
-            case "5":  // Löschen
+            case "5":
                 if (hasSavedGame()) this.deleteGame();
                 else System.out.println("Kein gespeichertes Spiel zum Löschen.");
                 break;
@@ -88,6 +111,7 @@ public class RobotApp {
         }
     }
 
+    // Startet ein neues Spiel und fragt nach dem Namen des Roboters
     private void startNewGame() {
         Scanner scanner = new Scanner(System.in);
         System.out.print("Wie soll dein Roboter heißen? ");
@@ -97,6 +121,7 @@ public class RobotApp {
         continueGame();
     }
 
+    // Führt das laufende Spiel im Spielmenü fort
     private void continueGame() {
         this.game.setGameRunning(true);
         Scanner scanner = new Scanner(System.in);
@@ -135,7 +160,6 @@ public class RobotApp {
                 case "4":
                     game.openMaintenanceMenu();
                     break;
-
                 case "5":
                     System.out.println("Spiel wird verlassen...");
                     return;
@@ -145,12 +169,14 @@ public class RobotApp {
         }
     }
 
+    // Löscht die gespeicherte Spieldatei
     private void deleteGame() {
         if (new File(SAVE_FILE_NAME).delete()) {
             System.out.println("Game deleted!");
         }
     }
 
+    // Speichert den aktuellen Spielstand in eine Datei
     private void saveGame() {
         try (FileOutputStream fos = new FileOutputStream(SAVE_FILE_NAME);
              ObjectOutputStream oos = new ObjectOutputStream(fos)) {
@@ -162,6 +188,7 @@ public class RobotApp {
         System.out.println("Game saved!");
     }
 
+    // Lädt den gespeicherten Spielstand aus der Datei
     private void loadGame() {
         try (FileInputStream fis = new FileInputStream(SAVE_FILE_NAME);
              ObjectInputStream ois = new ObjectInputStream(fis)) {
@@ -172,14 +199,26 @@ public class RobotApp {
         }
     }
 
+    /**
+     * Prüft, ob ein Spiel gerade läuft.
+     * return true, wenn ein Spiel aktiv ist
+     */
     private boolean isGameRunning() {
         return game != null;
     }
 
+    /**
+     * Prüft, ob das aktuelle Spiel beendet wurde.
+     * return true, wenn das Spiel abgeschlossen ist
+     */
     private boolean isGameFinished() {
         return game != null && game.isGameFinished();
     }
 
+    /**
+     * Prüft, ob eine gespeicherte Spieldatei existiert.
+     * return true, wenn eine Datei vorhanden ist
+     */
     private boolean hasSavedGame() {
         return new File(SAVE_FILE_NAME).exists();
     }

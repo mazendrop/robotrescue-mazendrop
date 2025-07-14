@@ -1,40 +1,45 @@
 package challenges;
 
-/*
+/**
+ * Die Klasse {@code MorseCode} ist eine Challenge, bei der ein zufällig gewähltes Wort
+ * in Morsecode umgewandelt wird. Der Benutzer muss das ursprüngliche Wort erraten.
+ * Die Morsezeichen werden ohne Verwendung einer Map verwaltet (konform zu Auflagen).
+ *
+ * Erlaubt sind 3 Versuche.
+ *
+ * Beispiel: Morsecode: "--.--.--.--." → Lösung: HELP
+ *
  * @author Mazen Abdallah
  * @author Hassan Ibrahim
  */
-
-import java.util.*;
-
 public class MorseCode implements Challenge {
     private static final long serialVersionUID = 1L;
-    private static final Map<Character, String> MORSE_MAP = new HashMap<>();
-    private final List<String> wordList = Arrays.asList("SOS", "CODE", "JAVA", "HTW", "HELP");
+
+    private final String[] wordList = {"SOS", "CODE", "JAVA", "HTW", "HELP"};
+
+    // Parallele Arrays für Buchstaben und ihre Morsezeichen
+    private final char[] letters = {
+            'A','B','C','D','E','F','G','H','I','J','K','L','M',
+            'N','O','P','Q','R','S','T','U','V','W','X','Y','Z'
+    };
+
+    private final String[] morseCodes = {
+            ".-", "-...", "-.-.", "-..", ".", "..-.", "--.", "....", "..",
+            ".---", "-.-", ".-..", "--", "-.", "---", ".--.", "--.-", ".-.",
+            "...", "-", "..-", "...-", ".--", "-..-", "-.--", "--.."
+    };
 
     private final String originalWord;
     private final String morseCode;
     private int attemptsLeft = 3;
     private boolean solved = false;
 
-    static {
-        MORSE_MAP.put('A', ".-"); MORSE_MAP.put('B', "-...");
-        MORSE_MAP.put('C', "-.-."); MORSE_MAP.put('D', "-..");
-        MORSE_MAP.put('E', "."); MORSE_MAP.put('F', "..-.");
-        MORSE_MAP.put('G', "--."); MORSE_MAP.put('H', "....");
-        MORSE_MAP.put('I', ".."); MORSE_MAP.put('J', ".---");
-        MORSE_MAP.put('K', "-.-"); MORSE_MAP.put('L', ".-..");
-        MORSE_MAP.put('M', "--"); MORSE_MAP.put('N', "-.");
-        MORSE_MAP.put('O', "---"); MORSE_MAP.put('P', ".--.");
-        MORSE_MAP.put('Q', "--.-"); MORSE_MAP.put('R', ".-.");
-        MORSE_MAP.put('S', "..."); MORSE_MAP.put('T', "-");
-        MORSE_MAP.put('U', "..-"); MORSE_MAP.put('V', "...-");
-        MORSE_MAP.put('W', ".--"); MORSE_MAP.put('X', "-..-");
-        MORSE_MAP.put('Y', "-.--"); MORSE_MAP.put('Z', "--..");
-    }
-
+    /**
+     * Konstruktor: Wählt zufällig ein Wort und kodiert es in Morsezeichen.
+     */
     public MorseCode() {
-        this.originalWord = wordList.get(new Random().nextInt(wordList.size()));
+        int index = (int) (Math.random() * wordList.length);
+        this.originalWord = wordList[index];
         this.morseCode = toMorse(originalWord);
     }
 
@@ -71,11 +76,26 @@ public class MorseCode implements Challenge {
         return "Morsecode: " + morseCode + " → Tipp: Verwende das internationale Morsealphabet.";
     }
 
+    /**
+     * Diese Methode wandelt ein Wort in Morsezeichen um.
+     */
     private String toMorse(String word) {
-        StringBuilder sb = new StringBuilder();
-        for (char c : word.toUpperCase().toCharArray()) {
-            sb.append(MORSE_MAP.getOrDefault(c, "")).append(" ");
+        String morse = "";
+        char[] chars = word.toUpperCase().toCharArray();
+
+        for (char c : chars) {
+            for (int i = 0; i < letters.length; i++) {
+                if (letters[i] == c) {
+                    morse = morse + morseCodes[i] + " ";
+                    break;
+                }
+            }
         }
-        return sb.toString().trim();
+
+        if (!morse.isEmpty()) {
+            morse = morse.substring(0, morse.length() - 1);  // Letztes Leerzeichen entfernen
+        }
+
+        return morse;
     }
 }

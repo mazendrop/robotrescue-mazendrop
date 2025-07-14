@@ -1,6 +1,10 @@
 package app;
 
-/*
+/**
+ * Diese Klasse repräsentiert den zentralen Spielablauf.
+ * Sie steuert den Roboter, die Räume, Herausforderungen,
+ * Kämpfe, Minispiele, Shuttle-Status und Spielende.
+ *
  * @author Mazen Abdallah
  * @author Hassan Ibrahim
  */
@@ -17,13 +21,22 @@ import java.util.Scanner;
 public class RobotGame implements Serializable {
     private static final long serialVersionUID = 1L;
 
+    /** Der gesteuerte Roboter */
     private final Robot robot;
+    /** Die drei Räume, die Herausforderungen und Artefakte enthalten */
     private final Room[] rooms = new Room[3];
+    /** Das Shuttle, das mit Artefakten ausgestattet wird */
     private final Shuttle shuttle;
 
+    /** Gibt an, ob das Spiel läuft */
     private boolean gameRunning = false;
+    /** Gibt an, ob das Spiel beendet ist */
     private boolean gameFinished = false;
 
+    /**
+     * Konstruktor: Initialisiert Roboter, Shuttle, Räume und Challenges.
+     * robotName der Name des Roboters
+     */
     public RobotGame(String robotName) {
         this.robot = new Robot(robotName);
         this.shuttle = new Shuttle("Zukunft");
@@ -60,6 +73,7 @@ public class RobotGame implements Serializable {
         return robot;
     }
 
+    /** Gibt den Status des Roboters aus */
     public void printStatus() {
         System.out.println("\n=== Roboter-Status ===");
         System.out.println("Name: " + robot.getName());
@@ -69,6 +83,7 @@ public class RobotGame implements Serializable {
         System.out.println("Funktionsfähig: " + (robot.isOperational() ? "Ja" : "Nein"));
     }
 
+    /** Führt eine Missionsrunde aus */
     public void run() {
         if (gameFinished) {
             System.out.println("Das Spiel ist bereits beendet.");
@@ -162,6 +177,7 @@ public class RobotGame implements Serializable {
         }
     }
 
+    /** Gibt eine Übersicht über den aktuellen Spiel- und Roboterstatus */
     public void printMissionStatus() {
         System.out.println("\n=== Missionsstatus ===");
         printStatus();
@@ -186,6 +202,7 @@ public class RobotGame implements Serializable {
         }
     }
 
+    /** Installiert alle gefundenen Artefakte im Shuttle */
     public boolean installArtifactsToShuttle() {
         boolean allesInstalliert = true;
         for (Artifact artifact : shuttle.getArtifacts()) {
@@ -199,6 +216,7 @@ public class RobotGame implements Serializable {
         return allesInstalliert && shuttle.isReadyToLaunch();
     }
 
+    /** Öffnet das Wartungsmenü zur Reparatur und Installation */
     public void openMaintenanceMenu() {
         Scanner scanner = new Scanner(System.in);
 
@@ -248,6 +266,7 @@ public class RobotGame implements Serializable {
         }
     }
 
+    /** Führt ein Minispiel durch (TicTacToe oder Nim) */
     private void playMiniGame() {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Wähle ein Spiel:");
@@ -273,6 +292,7 @@ public class RobotGame implements Serializable {
         }
     }
 
+    /** Wählt zufällig einen noch nicht geöffneten Raum */
     private Room chooseRandomClosedRoom() {
         return java.util.Arrays.stream(rooms)
                 .filter(r -> !r.isOpen())
