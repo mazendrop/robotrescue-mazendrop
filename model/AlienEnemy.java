@@ -5,6 +5,8 @@ package model;
  * @author Hassan Ibrahim
  */
 
+import java.util.Scanner;
+
 /**
  * Die Klasse {@code AlienEnemy} stellt einen feindlichen Gegner vom Typ "Alien" dar,
  * der im Kampf dem Roboter Energie entzieht.
@@ -23,14 +25,28 @@ public class AlienEnemy extends Enemy {
     }
 
     /**
-     * Kampfverhalten des Aliens: entzieht dem Roboter 15 Energiepunkte.
+     * Kampfverhalten des Aliens:
+     * Der Roboter muss eine einfache Rechenfrage beantworten. Bei falscher Antwort
+     * entzieht das Alien dem Roboter 15 Energiepunkte.
      *
      * @param robot Der Roboter, der angegriffen wird
      */
+
+
     @Override
     public void fight(Robot robot) {
-        int energyDrain = 15;
-        System.out.println(name + " entzieht dem Roboter Energie!");
-        robot.drainEnergy(energyDrain);
+        Scanner scanner = new Scanner(System.in);
+        System.out.println(name + " fordert dich zu einem Duell heraus!");
+        System.out.print("Was ist 17 * 9? ");
+        String antwort = scanner.nextLine();
+
+        if (antwort.trim().equals("153")) {
+            System.out.println("Richtige Antwort! Du hast den Kampf gewonnen!");
+            robot.addExperiencePoints(15);
+        } else {
+            System.out.println("Falsche Antwort! Du hast Schaden erlitten.");
+            robot.takeDamage(15);
+        }
     }
+
 }

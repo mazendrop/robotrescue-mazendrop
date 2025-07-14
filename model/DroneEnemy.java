@@ -5,6 +5,8 @@ package model;
  * @author Hassan Ibrahim
  */
 
+import java.util.Scanner;
+
 /**
  * Die Klasse {@code DroneEnemy} ist ein konkreter Gegnertyp, der vom Roboter bekämpft werden kann.
  * Beim Kampf verursacht die Drohne Schaden am Roboter.
@@ -23,14 +25,26 @@ public class DroneEnemy extends Enemy {
 
     /**
      * Implementiert das Kampfverhalten der Drohne.
-     * Die Drohne verursacht 10 Schadenspunkte am Roboter.
+     * Der Roboter muss eine einfache Rechenfrage lösen. Bei falscher Antwort
+     * verursacht die Drohne 10 Schadenspunkte.
      *
      * @param robot Der betroffene Roboter
      */
+
     @Override
     public void fight(Robot robot) {
-        int damage = 10;
-        System.out.println(name + " greift den Roboter an!");
-        robot.takeDamage(damage);
+        Scanner scanner = new Scanner(System.in);
+        System.out.println(name + " fordert dich zu einem Duell heraus!");
+        System.out.print("Was ist 3 + 4? ");
+        String antwort = scanner.nextLine();
+
+        if (antwort.trim().equals("7")) {
+            System.out.println("Richtige Antwort! Du hast den Kampf gewonnen!");
+            robot.addExperiencePoints(10);
+        } else {
+            System.out.println("Falsche Antwort! Du hast Schaden erlitten.");
+            robot.takeDamage(10);
+        }
     }
+
 }

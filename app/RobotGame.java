@@ -17,6 +17,7 @@ import challenges.*;
 
 import java.io.Serializable;
 import java.util.Scanner;
+import java.util.concurrent.*;
 
 public class RobotGame implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -146,23 +147,53 @@ public class RobotGame implements Serializable {
             System.out.println("Der Roboter stößt auf eine verschlossene Tür...");
             System.out.println("Challenge: " + challenge.getDescription());
             System.out.println("Hinweis: " + challenge.getHint());
-            System.out.print("Deine Antwort: ");
-            String antwort = scanner.nextLine();
+            //System.out.print("Deine Antwort: ");
+            //String antwort = scanner.nextLine();
 
-            if (challenge.tryCode(antwort)) {
-                roomToOpen.setOpen(true);
-                Artifact artifact = roomToOpen.getArtifact();
-                if (artifact != null) {
-                    artifact.setFound(true);
-                    System.out.println("Challenge bestanden! Der Raum wird geöffnet.");
-                    System.out.println("Der Roboter findet das Artefakt '" + artifact.getName() + "' und gewinnt Energie.");
-                    robot.recharge(20);
-                } else {
-                    System.out.println("Challenge bestanden! Raum geöffnet, aber kein Artefakt gefunden.");
+
+
+            int versuch = 1;
+            while (challenge.getAttemptsLeft() > 0 && !challenge.isSolved()) {
+
+
+                //Wir wissen nicht ob diese ( ExecutorService ) erlaubt ist oder nicht.
+                 System.out.println("Du hast 30 Sekunden, um die Antwort einzugeben:");
+
+                ExecutorService executor = Executors.newSingleThreadExecutor();
+                Future<String> future = executor.submit(scanner::nextLine);
+                String antwort = null;
+                try {
+                    antwort = future.get(30, TimeUnit.SECONDS);
+                } catch (TimeoutException e) {
+                    System.out.println(" Zeit überschritten! Keine Antwort gegeben.");
+                    antwort = ""; // damit der Versuch als falsch zählt
+                } catch (Exception e) {
+                    System.out.println("Ein Fehler ist aufgetreten: " + e.getMessage());
+                    antwort = "";
                 }
-            } else {
+                executor.shutdown();
+
+                if (challenge.tryCode(antwort)) {
+                    roomToOpen.setOpen(true);
+                    Artifact artifact = roomToOpen.getArtifact();
+                    if (artifact != null) {
+                        artifact.setFound(true);
+                        System.out.println("Challenge bestanden! Der Raum wird geöffnet.");
+                        System.out.println("Der Roboter findet das Artefakt '" + artifact.getName() + "' und gewinnt Energie.");
+                        robot.recharge(20);
+                    } else {
+                        System.out.println("Challenge bestanden! Raum geöffnet, aber kein Artefakt gefunden.");
+                    }
+                    break;
+                } else {
+                    System.out.println("Falsch. Noch " + challenge.getAttemptsLeft() + " Versuche.");
+                }
+            }
+
+            if (!challenge.isSolved()) {
                 System.out.println("Challenge nicht bestanden. Der Roboter zieht sich zurück.");
             }
+
         }
 
         if (shuttle.isReadyToLaunch()) {
@@ -176,6 +207,7 @@ public class RobotGame implements Serializable {
             gameFinished = true;
         }
     }
+
 
     /** Gibt eine Übersicht über den aktuellen Spiel- und Roboterstatus */
     public void printMissionStatus() {
@@ -254,6 +286,7 @@ public class RobotGame implements Serializable {
                     if (shuttle.isReadyToLaunch()) {
                         System.out.println("Alle Artefakte installiert! Shuttle bereit zum Start. Spiel erfolgreich beendet 🚀");
                         gameFinished = true;
+                        System.exit(0);
                     }
                     break;
 
@@ -294,9 +327,32 @@ public class RobotGame implements Serializable {
 
     /** Wählt zufällig einen noch nicht geöffneten Raum */
     private Room chooseRandomClosedRoom() {
-        return java.util.Arrays.stream(rooms)
-                .filter(r -> !r.isOpen())
-                .findAny()
-                .orElse(null);
+        // Schritt 1: Zähle wie viele Räume noch geschlossen sind
+        int count = 0;
+        for (Room room : rooms) {
+            if (!room.isOpen()) {
+                count++;
+            }
+        }
+
+        // Schritt 2: Wenn alle offen sind, gib null zurück
+        if (count == 0) return null;
+
+        // Schritt 3: Wähle einen zufälligen Index unter den geschlossenen Räumen
+        int randomIndex = (int) (Math.random() * count);
+
+        // Schritt 4: Durchlaufe erneut, um das entsprechende geschlossene Zimmer zu finden
+        int currentIndex = 0;
+        for (Room room : rooms) {
+            if (!room.isOpen()) {
+                if (currentIndex == randomIndex) {
+                    return room;
+                }
+                currentIndex++;
+            }
+        }
+
+        return null; // sollte eigentlich nie erreicht werden
     }
+
 }

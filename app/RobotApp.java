@@ -166,6 +166,12 @@ public class RobotApp {
                 default:
                     System.out.println("Ungültige Eingabe.");
             }
+
+            if (game.isGameFinished()) {
+                System.out.println("🎉 Das Spiel wurde erfolgreich beendet. Danke fürs Spielen!");
+                break;
+            }
+
         }
     }
 

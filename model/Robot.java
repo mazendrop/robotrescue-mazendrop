@@ -130,6 +130,7 @@ public class Robot implements Serializable {
             System.out.println("Schwacher Schaden!");
         }
 
+
         damage += effective;
         if (damage >= 100) {
             damage = 100;

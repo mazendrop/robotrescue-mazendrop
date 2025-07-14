@@ -41,6 +41,8 @@ public class SecretCode implements Challenge {
         if (solved || attemptsLeft <= 0) {
             return false;
         }
+        System.out.println("DEBUG: Original war: " + originalWord);
+
 
         if (input.trim().equalsIgnoreCase(originalWord)) {
             solved = true;
